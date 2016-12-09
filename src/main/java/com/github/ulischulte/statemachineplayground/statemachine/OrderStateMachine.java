@@ -40,7 +40,7 @@ public class OrderStateMachine {
       orderRepository.updateOrderState(orderState, order.getId());
       return orderState;
     } else {
-      logger.warn("Could not accept Event " + orderEvent + " for Order " + order.getId());
+      logger.warn(String.format("Could not accept event %s for order %s",  orderEvent ,order.getId()));
       return order.getOrderState();
     }
   }

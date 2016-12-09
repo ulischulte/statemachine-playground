@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProductNotInStockGuard implements Guard<OrderState, OrderEvent> {
+
   @Override
   public boolean evaluate(StateContext<OrderState, OrderEvent> context) {
     final Order order = StateMachineUtil.extractOrder(context);

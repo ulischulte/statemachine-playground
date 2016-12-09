@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 
@@ -45,9 +46,8 @@ public class OrderStateMachineConfig extends StateMachineConfigurerAdapter<Order
   @Override
   public void configure(StateMachineTransitionConfigurer<OrderState, OrderEvent> transitions)
       throws Exception {
-    // TODO: choices, actions, guards...
     transitions
-        .withExternal()
+      .withExternal()
         .source(INITIAL).target(CHOICE_BEGIN_PROCESSING)
         .event(OrderEvent.PROCESS)
         .and()
@@ -71,5 +71,12 @@ public class OrderStateMachineConfig extends StateMachineConfigurerAdapter<Order
       .withExternal()
         .source(SENT).target(DELIVERED)
         .event(OrderEvent.DELIVER);
+  }
+
+  @Override
+  public void configure(StateMachineConfigurationConfigurer<OrderState, OrderEvent> config) throws Exception {
+    config.withConfiguration()
+        .autoStartup(true)
+        .listener(new StateMachineListener());
   }
 }
