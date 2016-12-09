@@ -12,12 +12,12 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Component;
 
+import static com.github.ulischulte.statemachineplayground.statemachine.StateMachineUtil.ORDER_MESSAGE_HEADER_KEY;
+
 @Component
 public class OrderStateMachine {
 
   private final Log logger = LogFactory.getLog(this.getClass());
-
-  private final static String ORDER_MESSAGE_HEADER_KEY = "order";
 
   private OrderRepository orderRepository;
   private StateMachine<OrderState, OrderEvent> stateMachine;

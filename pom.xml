@@ -9,13 +9,13 @@
 	<packaging>jar</packaging>
 
 	<name>statemachineplayground</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Spring Statemachine playground</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.4.2.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 
 	<properties>
@@ -36,6 +36,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
+      <optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.statemachine</groupId>

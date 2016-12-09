@@ -1,6 +1,9 @@
 package com.github.ulischulte.statemachineplayground.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.Random;
 
 @Entity
 @Table(name = "ORDERS")
@@ -36,5 +39,19 @@ public class Order {
 
   public void setProduct(String product) {
     this.product = product;
+  }
+
+  @JsonIgnore
+  public boolean isInStock() {
+    return new Random().nextBoolean();
+  }
+
+  @Override
+  public String toString() {
+    return "Order{" +
+        "id=" + id +
+        ", orderState=" + orderState +
+        ", product='" + product + '\'' +
+        '}';
   }
 }
