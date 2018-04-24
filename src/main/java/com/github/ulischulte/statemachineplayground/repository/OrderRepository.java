@@ -9,11 +9,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Repository
 @Transactional
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
-  Order findById(Integer id);
+  Optional<Order> findById(Integer id);
 
   @Query("update Order o set o.orderState = :orderState where o.id = :id")
   @Modifying

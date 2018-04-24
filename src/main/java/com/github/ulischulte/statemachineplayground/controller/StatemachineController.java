@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/state")
@@ -28,20 +29,23 @@ public class StatemachineController {
   }
 
   @GetMapping("/{event}/{orderId}")
-  public OrderState fireEvent(@PathVariable("event") final OrderEvent orderEvent, @PathVariable("orderId") final Integer orderId,
+  public OrderState fireEvent(
+      @PathVariable("event") final OrderEvent orderEvent,
+      @PathVariable("orderId") final Integer orderId,
       final HttpServletResponse response) {
-    final Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      response.setStatus(HttpStatus.NOT_FOUND.value());
-      return null;
-    }
-    return orderStateMachine.sendOrderEvent(order, orderEvent);
+    Optional<Order> maybeOrder = orderRepository.findById(orderId);
+    return maybeOrder.map(order -> orderStateMachine.sendOrderEvent(order, orderEvent))
+        .orElseGet(() -> {
+          response.setStatus(HttpStatus.NOT_FOUND.value());
+          return null;
+        });
   }
 
   @GetMapping("/{orderId}")
   public OrderState getOrderState(@PathVariable("orderId") final Integer orderId) {
-    final Order order = orderRepository.findById(orderId);
-    return order.getOrderState();
+    final Optional<Order> maybeOrder = orderRepository.findById(orderId);
+    return maybeOrder.map(Order::getOrderState)
+        .orElse(null);
   }
 
 }
