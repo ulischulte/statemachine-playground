@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
+import lombok.Builder;
+
 @Entity
 @Table(name = "ORDERS")
+@Builder(toBuilder = true)
 public class Order {
 
   @Id

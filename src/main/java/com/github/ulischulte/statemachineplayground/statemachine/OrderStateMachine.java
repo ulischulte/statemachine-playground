@@ -9,13 +9,15 @@ import com.github.ulischulte.statemachineplayground.repository.OrderRepository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class OrderStateMachine {
 
   private static final String STATEMACHINE_PREFIX = "orderStateMachine_";
@@ -23,12 +25,6 @@ public class OrderStateMachine {
 
   private final OrderRepository orderRepository;
   private final StateMachineService<OrderState, OrderEvent> stateMachineService;
-
-  @Autowired
-  public OrderStateMachine(final OrderRepository orderRepository, final StateMachineService<OrderState, OrderEvent> stateMachineService) {
-    this.orderRepository = orderRepository;
-    this.stateMachineService = stateMachineService;
-  }
 
   public OrderState sendOrderEvent(final Order order, final OrderEvent orderEvent) {
     final StateMachine<OrderState, OrderEvent> stateMachine = stateMachineService
