@@ -8,7 +8,6 @@ import com.github.ulischulte.statemachineplayground.model.OrderEvent;
 import com.github.ulischulte.statemachineplayground.model.OrderState;
 import com.github.ulischulte.statemachineplayground.repository.OrderRepository;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +27,35 @@ public class OrderStateMachineTest {
   private OrderRepository orderRepository;
 
   @Test
-  @Ignore("fails eventually since processing is depending on Order.isInStock (which is random right now;))")
-  public void sendOrderEvent__process_on_initial_sets_state_to_processing() throws Exception {
+  public void sendOrderEvent__process_on_initial_sets_state_to_processing() {
     final Order order = createOrder(OrderState.INITIAL);
     final OrderState orderState = orderStateMachine.sendOrderEvent(order, OrderEvent.PROCESS);
     assertThat(orderState).isEqualTo(OrderState.PROCESSING);
   }
 
   @Test
-  public void sendOrderEvent__send_on_initial_has_no_effect_on_state() throws Exception {
+  public void sendOrderEvent__process_results_in_waiting_for_production_if_scarce_item() {
+    final Order order = createOrder(OrderState.INITIAL);
+    order.setProduct("SCARCE_ITEM");
+    final OrderState orderState = orderStateMachine.sendOrderEvent(order, OrderEvent.PROCESS);
+    assertThat(orderState).isEqualTo(OrderState.WAITING_FOR_PRODUCTION);
+  }
+
+  @Test
+  public void sendOrderEvent__send_on_initial_has_no_effect_on_state() {
     final Order order = createOrder(OrderState.INITIAL);
     final OrderState orderState = orderStateMachine.sendOrderEvent(order, OrderEvent.SEND);
     assertThat(orderState).isEqualTo(OrderState.INITIAL);
+  }
+
+  @Test
+  public void test() {
+    final Order order = createOrder(OrderState.INITIAL);
+    final OrderState orderState = orderStateMachine.sendOrderEvent(order, OrderEvent.PROCESS);
+    assertThat(orderState).isEqualTo(OrderState.PROCESSING);
+
+    final OrderState orderState1 = orderStateMachine.sendOrderEvent(order, OrderEvent.SEND);
+    assertThat(orderState1).isEqualTo(OrderState.SENT);
   }
 
   private Order createOrder(OrderState state) {

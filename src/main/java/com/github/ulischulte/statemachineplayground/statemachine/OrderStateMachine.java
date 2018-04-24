@@ -31,24 +31,20 @@ public class OrderStateMachine {
   }
 
   public OrderState sendOrderEvent(final Order order, final OrderEvent orderEvent) {
-    try {
-      final StateMachine<OrderState, OrderEvent> stateMachine = stateMachineService
-          .acquireStateMachine(STATEMACHINE_PREFIX + order.getId());
+    final StateMachine<OrderState, OrderEvent> stateMachine = stateMachineService
+        .acquireStateMachine(STATEMACHINE_PREFIX + order.getId());
 
-      final boolean eventAccepted = stateMachine.sendEvent(MessageBuilder.withPayload(orderEvent)
-          .setHeader(ORDER_MESSAGE_HEADER_KEY, order)
-          .build());
+    final boolean eventAccepted = stateMachine.sendEvent(MessageBuilder.withPayload(orderEvent)
+        .setHeader(ORDER_MESSAGE_HEADER_KEY, order)
+        .build());
 
-      if (eventAccepted) {
-        final OrderState orderState = stateMachine.getState().getId();
-        orderRepository.updateOrderState(orderState, order.getId());
-        return orderState;
-      } else {
-        logger.warn(String.format("Could not accept event %s for order %s", orderEvent, order.getId()));
-        return order.getOrderState();
-      }
-    } finally {
-      stateMachineService.releaseStateMachine(STATEMACHINE_PREFIX + order.getId());
+    if (eventAccepted) {
+      final OrderState orderState = stateMachine.getState().getId();
+      orderRepository.updateOrderState(orderState, order.getId());
+      return orderState;
+    } else {
+      logger.warn(String.format("Could not accept event %s for order %s", orderEvent, order.getId()));
+      return order.getOrderState();
     }
   }
 
