@@ -1,22 +1,23 @@
 package com.github.ulischulte.statemachineplayground.statemachine;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.github.ulischulte.statemachineplayground.StatemachineplaygroundApplication;
 import com.github.ulischulte.statemachineplayground.model.Order;
 import com.github.ulischulte.statemachineplayground.model.OrderEvent;
 import com.github.ulischulte.statemachineplayground.model.OrderState;
 import com.github.ulischulte.statemachineplayground.repository.OrderRepository;
-import com.github.ulischulte.statemachineplayground.repository.OrderRepositoryConfig;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { OrderStateMachineConfig.class, OrderRepositoryConfig.class})
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { StatemachineplaygroundApplication.class })
 @Transactional
 public class OrderStateMachineTest {
 

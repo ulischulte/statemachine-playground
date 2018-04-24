@@ -1,65 +1,52 @@
 package com.github.ulischulte.statemachineplayground.repository;
 
 import com.github.ulischulte.statemachineplayground.model.Order;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.statemachine.data.jpa.JpaRepositoryStateMachine;
+import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
 import org.springframework.util.ClassUtils;
 
 import javax.sql.DataSource;
 
 @Configuration
-@EnableJpaRepositories(basePackageClasses = {OrderRepository.class}, entityManagerFactoryRef = "orderStatemachineEntityManagerFactory",
-    transactionManagerRef = "orderStatemachineTransactionManager")
+@EnableJpaRepositories(basePackageClasses = {
+    OrderRepository.class,
+    JpaStateMachineRepository.class })
 public class OrderRepositoryConfig {
 
-  private DataSource dataSource;
-
   @Bean
-  public DataSource initializeDataSource() {
-    return new EmbeddedDatabaseBuilder()
-        .setType(EmbeddedDatabaseType.H2)
-        .addScript("db/createOrders.sql")
-        .build();
-  }
-
-  @Bean(name = "orderStatemachineEntityManagerFactory")
-  public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+  public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
     final LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
-    entityManagerFactoryBean.setDataSource(getDataSource());
+    entityManagerFactoryBean.setDataSource(dataSource);
     entityManagerFactoryBean.setJpaVendorAdapter(hibernateJpaVendorAdapter());
     entityManagerFactoryBean.setPersistenceUnitName("orderUnit");
-    entityManagerFactoryBean.setPackagesToScan(ClassUtils.getPackageName(Order.class));
+    entityManagerFactoryBean.setPackagesToScan(ClassUtils.getPackageName(Order.class),
+        ClassUtils.getPackageName(JpaRepositoryStateMachine.class));
 
     return entityManagerFactoryBean;
   }
 
   private HibernateJpaVendorAdapter hibernateJpaVendorAdapter() {
     final HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
-    hibernateJpaVendorAdapter.setGenerateDdl(false);
+    hibernateJpaVendorAdapter.setGenerateDdl(true);
     hibernateJpaVendorAdapter.setShowSql(true);
     hibernateJpaVendorAdapter.getJpaPropertyMap().put("hibernate.hbm2ddl.auto", "validate");
     hibernateJpaVendorAdapter.getJpaPropertyMap().put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
     return hibernateJpaVendorAdapter;
   }
 
-  @Bean(name = "orderStatemachineTransactionManager")
-  public JpaTransactionManager transactionManager() {
+  @Bean
+  public JpaTransactionManager transactionManager(DataSource dataSource) {
     final JpaTransactionManager transactionManager = new JpaTransactionManager();
-    transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
-    transactionManager.setDataSource(getDataSource());
+    transactionManager.setEntityManagerFactory(entityManagerFactory(dataSource).getObject());
+    transactionManager.setDataSource(dataSource);
     return transactionManager;
   }
 
-  private DataSource getDataSource() {
-    if (dataSource == null) {
-      dataSource = initializeDataSource();
-    }
-    return dataSource;
-  }
 }
