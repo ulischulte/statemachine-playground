@@ -2,14 +2,15 @@ package com.github.ulischulte.statemachineplayground.controller;
 
 import com.github.ulischulte.statemachineplayground.model.Order;
 import com.github.ulischulte.statemachineplayground.repository.OrderRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class OrderController {
@@ -21,7 +22,7 @@ public class OrderController {
     this.orderRepository = orderRepository;
   }
 
-  @PostMapping(value = "/order", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/order", produces = MediaType.APPLICATION_JSON_VALUE)
   public Integer createOrder(@RequestBody final Order order) {
     return orderRepository.save(order).getId();
   }
@@ -29,5 +30,14 @@ public class OrderController {
   @GetMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Order> getAllOrders() {
     return orderRepository.findAll();
+  }
+
+  @GetMapping(value = "/order/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Order getOrder(@PathVariable("id") final Integer id, final HttpServletResponse response) {
+    return orderRepository.findById(id)
+        .orElseGet(() -> {
+          response.setStatus(HttpStatus.NOT_FOUND.value());
+          return null;
+        });
   }
 }

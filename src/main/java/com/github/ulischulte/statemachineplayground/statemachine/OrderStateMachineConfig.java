@@ -18,23 +18,17 @@ import org.springframework.statemachine.persist.StateMachineRuntimePersister;
 
 import java.util.EnumSet;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @ComponentScan(basePackageClasses = { OrderStateMachineConfig.class })
 @EnableStateMachineFactory
+@RequiredArgsConstructor
 public class OrderStateMachineConfig extends StateMachineConfigurerAdapter<OrderState, OrderEvent> {
 
   private final ProductNotInStockGuard productNotInStockGuard;
   private final ProduceOrderAction produceOrderAction;
   private final StateMachineRuntimePersister<OrderState, OrderEvent, String> stateMachineRuntimePersister;
-
-  public OrderStateMachineConfig(
-      final ProductNotInStockGuard productNotInStockGuard,
-      final ProduceOrderAction produceOrderAction,
-      final StateMachineRuntimePersister<OrderState, OrderEvent, String> stateMachineRuntimePersister) {
-    this.productNotInStockGuard = productNotInStockGuard;
-    this.produceOrderAction = produceOrderAction;
-    this.stateMachineRuntimePersister = stateMachineRuntimePersister;
-  }
 
   @Override
   public void configure(StateMachineStateConfigurer<OrderState, OrderEvent> states)
@@ -87,9 +81,5 @@ public class OrderStateMachineConfig extends StateMachineConfigurerAdapter<Order
     config
         .withPersistence()
         .runtimePersister(stateMachineRuntimePersister);
-    config
-        .withConfiguration()
-        .autoStartup(true)
-        .listener(new StateMachineListener());
   }
 }
